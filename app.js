@@ -37,10 +37,17 @@ const apiLimiter = rateLimit({
 });
 
 app.use(helmet());
-app.use(cors({
-  origin: ["http://localhost:3000"],
-  credentials: true,
-}));
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://auctionnewfront.vercel.app/",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(morgan("dev"));
 app.use(express.json({ limit: "100kb" }));
 
