@@ -42,7 +42,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://auctionnewfront.vercel.app/",
+      "https://auctionnewfront.vercel.app",
     ],
     credentials: true,
   })
