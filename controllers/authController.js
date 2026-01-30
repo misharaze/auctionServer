@@ -74,7 +74,7 @@ export const login = async (req, res) => {
   }
 
   const { rows } = await query(
-    `SELECT * FROM users WHERE email = $1`,
+    `SELECT * FROM public.users WHERE email = $1`,
     [email]
   );
 
