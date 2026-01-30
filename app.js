@@ -23,14 +23,6 @@ const app = express();
 
 
 
-const authLimiter = rateLimit({
- windowMs: 15 * 60 * 1000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: (req) => req.ip, // 🔥 ВАЖНО
-});
-
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 120,
@@ -38,11 +30,20 @@ const apiLimiter = rateLimit({
 
 app.use(helmet());
 
+app.set("trust proxy", 1);
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://auctionnewfront.vercel.app",
+      "https://auctionnewsfront.vercel.app",
     ],
     credentials: true,
   })
