@@ -4,6 +4,7 @@ import { pool } from "../db/index.js";
  * GET /api/giveaways
  * Активные розыгрыши
  */
+
 export const getAllGiveaways = async (req, res) => {
   try {
     const { rows } = await pool.query(`
@@ -12,7 +13,7 @@ export const getAllGiveaways = async (req, res) => {
         g.title,
         g.image,
         g.ends_at,
-        COUNT(gp.user_id)::int AS participants
+        COUNT(DISTINCT gp.user_id)::int AS participants
       FROM giveaways g
       LEFT JOIN giveaway_participants gp
         ON gp.giveaway_id = g.id
@@ -31,7 +32,6 @@ export const getAllGiveaways = async (req, res) => {
 
 /**
  * POST /api/giveaways/:id/join
- * Участвовать в розыгрыше
  */
 export const joinGiveaway = async (req, res) => {
   const userId = req.user.id;
@@ -42,7 +42,7 @@ export const joinGiveaway = async (req, res) => {
       `
       INSERT INTO giveaway_participants (giveaway_id, user_id)
       VALUES ($1, $2)
-      ON CONFLICT (giveaway_id, user_id) DO NOTHING
+      ON CONFLICT DO NOTHING
       `,
       [giveawayId, userId]
     );
@@ -53,6 +53,7 @@ export const joinGiveaway = async (req, res) => {
     res.status(500).json({ error: "Failed to join giveaway" });
   }
 };
+
 
 /**
  * GET /api/giveaways/history
