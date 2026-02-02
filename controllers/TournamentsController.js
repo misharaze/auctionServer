@@ -1,11 +1,12 @@
-import { pool } from "../db/index.js";
+import {pool} from "../db/index.js"
+
 
 export const getAllTournaments = async (req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT
         t.*,
-        COUNT(p.id) AS players
+        COUNT(p.user_id) AS players
       FROM tournaments t
       LEFT JOIN tournament_participants p
         ON p.tournament_id = t.id
@@ -15,7 +16,7 @@ export const getAllTournaments = async (req, res) => {
 
     res.json(rows);
   } catch (e) {
-    console.error(e);
+    console.error("getAllTournaments error:", e);
     res.status(500).json({ error: "Failed to load tournaments" });
   }
 };
