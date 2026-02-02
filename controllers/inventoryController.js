@@ -6,7 +6,6 @@ export const getMyInventory = async (req, res) => {
 
     const { rows } = await pool.query(`
       SELECT
-        ui.id AS inventory_id,
         i.id AS item_id,
         i.name,
         i.image_url,
