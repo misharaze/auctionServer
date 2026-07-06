@@ -13,13 +13,14 @@ export const getAllGiveaways = async (req, res) => {
         g.title,
         g.image,
         g.ends_at,
-        COUNT(DISTINCT gp.user_id)::int AS participants
+        (
+          SELECT COUNT(*)
+          FROM giveaway_participants gp
+          WHERE gp.giveaway_id = g.id
+        )::int AS participants
       FROM giveaways g
-      LEFT JOIN giveaway_participants gp
-        ON gp.giveaway_id = g.id
       WHERE g.is_finished = false
         AND g.ends_at > NOW()
-      GROUP BY g.id
       ORDER BY g.ends_at ASC
     `);
 
@@ -68,14 +69,15 @@ export const getGiveawayHistory = async (req, res) => {
         g.image,
         g.ends_at,
         u.username AS winner,
-        COUNT(gp.user_id)::int AS participants
+        (
+          SELECT COUNT(*)
+          FROM giveaway_participants gp
+          WHERE gp.giveaway_id = g.id
+        )::int AS participants
       FROM giveaways g
       LEFT JOIN users u
         ON u.id = g.winner_id
-      LEFT JOIN giveaway_participants gp
-        ON gp.giveaway_id = g.id
       WHERE g.is_finished = true
-      GROUP BY g.id, u.username
       ORDER BY g.ends_at DESC
       LIMIT 50
     `);

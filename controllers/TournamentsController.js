@@ -3,17 +3,17 @@ import {pool} from "../db/index.js"
 
 export const getAllTournaments = async (req, res) => {
   try {
-    const { rows } = await pool.query(`
-      SELECT
-        t.*,
-        COUNT(p.user_id) AS players
-      FROM tournaments t
-      LEFT JOIN tournament_participants p
-        ON p.tournament_id = t.id
-      GROUP BY t.id
-      ORDER BY t.starts_at ASC
-    `);
-
+const { rows } = await pool.query(`
+  SELECT
+    t.*,
+    (
+      SELECT COUNT(*)
+      FROM tournament_participants tp
+      WHERE tp.tournament_id = t.id
+    )::int AS players
+  FROM tournaments t
+  ORDER BY t.starts_at ASC
+`);
     res.json(rows);
   } catch (e) {
     console.error("getAllTournaments error:", e);

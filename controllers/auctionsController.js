@@ -10,7 +10,7 @@ import { placeBidSafe } from "../services/bidService.js";
 export const getAuctions = async (req, res) => {
   try {
    const { rows } = await query(`
-  SELECT 
+SELECT
     a.id,
     a.start_price,
     a.min_step,
@@ -18,17 +18,27 @@ export const getAuctions = async (req, res) => {
     i.name AS title,
     i.image_url,
     GREATEST(
-      FLOOR(EXTRACT(EPOCH FROM (a.ends_at - NOW()))),
-      0
+        FLOOR(EXTRACT(EPOCH FROM (a.ends_at - NOW()))),
+        0
     ) AS time_left,
-    COUNT(b.id) AS bids_count,
-    MAX(b.amount) AS leader
-  FROM auctions a
-  JOIN items i ON i.id = a.item_id
-  LEFT JOIN bids b ON b.auction_id = a.id
-  WHERE a.status = 'active'
-  GROUP BY a.id, i.name, i.image_url
-  ORDER BY a.created_at DESC
+    (
+        SELECT COUNT(*)
+        FROM bids b
+        WHERE b.auction_id = a.id
+    )::int AS bids_count,
+    COALESCE(
+        (
+            SELECT MAX(amount)
+            FROM bids b
+            WHERE b.auction_id = a.id
+        ),
+        a.start_price
+    ) AS leader
+FROM auctions a
+JOIN items i
+    ON i.id = a.item_id
+WHERE a.status = 'active'
+ORDER BY a.created_at DESC;
 `);
 res.json(
   rows.map((a) => ({
