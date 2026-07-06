@@ -25,7 +25,7 @@ export const getHomeData = async (req, res) => {
       JOIN items i ON i.id = a.item_id
       LEFT JOIN bids b ON b.auction_id = a.id
       WHERE a.ends_at > NOW()
-      GROUP BY a.id, i.name, i.image
+      GROUP BY a.id, i.name, i.image, a.ends_at, a.start_price
       ORDER BY a.ends_at
       LIMIT 6
     `);
